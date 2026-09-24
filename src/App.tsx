@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 const WEDDING_DATE = new Date('2026-10-30T11:00:00+02:00')
 
@@ -19,30 +19,6 @@ function getCountdown(): Countdown {
     seconds: Math.floor((remaining / 1_000) % 60),
     complete: remaining === 0,
   }
-}
-
-function createCalendarUrl(): string {
-  const calendar = [
-    'BEGIN:VCALENDAR',
-    'VERSION:2.0',
-    'PRODID:-//Karin and Niv//Wedding Invitation//HE',
-    'CALSCALE:GREGORIAN',
-    'METHOD:PUBLISH',
-    'BEGIN:VEVENT',
-    'UID:karin-niv-20261030@wedding.local',
-    'DTSTAMP:20260924T171000Z',
-    'DTSTART:20261030T090000Z',
-    'DTEND:20261030T140000Z',
-    'SUMMARY:החתונה של קרין וניב',
-    'LOCATION:5.91 מתחם אירועים על הים\\, נתניה',
-    'DESCRIPTION:קבלת פנים 11:00 | חופה וקידושין 12:00',
-    'STATUS:CONFIRMED',
-    'TRANSP:OPAQUE',
-    'END:VEVENT',
-    'END:VCALENDAR',
-  ].join('\r\n')
-
-  return `data:text/calendar;charset=utf-8,${encodeURIComponent(`\ufeff${calendar}\r\n`)}`
 }
 
 function ScratchReveal({ onReveal }: { onReveal: () => void }) {
@@ -181,7 +157,7 @@ function App() {
   const [isOpen, setIsOpen] = useState(false)
   const [isRevealed, setIsRevealed] = useState(false)
   const [countdown, setCountdown] = useState(getCountdown)
-  const calendarUrl = useMemo(createCalendarUrl, [])
+  const calendarUrl = `${import.meta.env.BASE_URL}karin-niv-wedding.ics`
 
   useEffect(() => {
     const timer = window.setInterval(() => setCountdown(getCountdown()), 1000)
@@ -207,7 +183,6 @@ function App() {
           <a
             className="calendar-button"
             href={calendarUrl}
-            download="karin-and-niv-wedding.ics"
           >
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M7 2v3M17 2v3M3.5 9h17M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z" />
@@ -255,16 +230,7 @@ function App() {
           <div className="wax-seal">
             <span>K</span><i>&</i><span>N</span>
           </div>
-          <svg className="seal-copy" viewBox="0 0 300 300" aria-hidden="true">
-            <defs>
-              <path id="seal-copy-path" d="M 36 184 A 122 122 0 0 0 264 184" />
-            </defs>
-            <text>
-              <textPath href="#seal-copy-path" startOffset="50%" textAnchor="middle">
-                לחצו כאן לפתיחת ההזמנה
-              </textPath>
-            </text>
-          </svg>
+          <span className="seal-copy" dir="rtl">לחצו כאן לפתיחת ההזמנה</span>
         </div>
       </div>
     </main>

@@ -299,18 +299,17 @@ a,
 
 .seal-copy {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  animation: hint-breathe 2.2s ease-in-out infinite;
-  pointer-events: none;
-}
-
-.seal-copy text {
-  fill: #96752f;
+  top: 245px;
+  left: 50%;
+  width: max-content;
+  color: #96752f;
   font: 300 18px 'Frank Ruhl Libre', Georgia, serif;
   letter-spacing: 1px;
+  direction: rtl;
+  unicode-bidi: isolate;
+  transform: translateX(-50%);
+  animation: hint-breathe 2.2s ease-in-out infinite;
+  pointer-events: none;
 }
 
 @keyframes hint-breathe {
