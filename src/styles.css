@@ -1,0 +1,369 @@
+@import url('https://fonts.googleapis.com/css2?family=Assistant:wght@300;400&family=Frank+Ruhl+Libre:wght@300;400&display=swap');
+
+:root {
+  font-family: 'Assistant', Arial, sans-serif;
+  color: #59584f;
+  background: #e9e1d1;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: #e9e1d1;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+button,
+a,
+[role='button'] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.invitation {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  min-height: 100svh;
+  padding: 28px 16px 80px;
+  overflow-x: hidden;
+  isolation: isolate;
+  user-select: none;
+}
+
+.paper-grain {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 16% 14%, rgba(255, 255, 255, .68), transparent 30%),
+    radial-gradient(circle at 84% 76%, rgba(177, 158, 125, .18), transparent 28%),
+    repeating-linear-gradient(118deg, rgba(80, 70, 50, .016) 0 1px, transparent 1px 6px);
+  pointer-events: none;
+}
+
+.card {
+  width: min(100%, 440px);
+  overflow: hidden;
+  background: #eee7d8;
+  box-shadow: 0 24px 55px rgba(74, 63, 45, .18);
+}
+
+.artwork {
+  position: relative;
+}
+
+.artwork > img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.scratch-area {
+  position: fixed;
+  z-index: 15;
+  inset: 0;
+  width: 100vw;
+  height: 100svh;
+  opacity: 1;
+  transition: opacity 650ms cubic-bezier(.22, 1, .36, 1);
+}
+
+.scratch-area.is-finishing {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.scratch-area canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  touch-action: none;
+}
+
+.scratch-area canvas:active {
+  cursor: grabbing;
+}
+
+.scratch-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  color: #66645c;
+  font-size: .74rem;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  animation: scratch-guide 1.8s ease-in-out infinite;
+  transition: opacity 180ms ease;
+}
+
+.scratch-hint svg {
+  width: 33px;
+  fill: rgba(241, 235, 220, .95);
+  stroke: #66645c;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.25;
+}
+
+.has-started .scratch-hint {
+  opacity: 0;
+}
+
+@keyframes scratch-guide {
+  50% { transform: translate(calc(-50% - 34px), calc(-50% - 22px)) rotate(-6deg); }
+}
+
+.card-details {
+  display: grid;
+  justify-items: center;
+  padding: 4px 28px 34px;
+  text-align: center;
+}
+
+.countdown {
+  width: 100%;
+  padding: 20px 0 18px;
+  border-block: 1px solid rgba(87, 87, 79, .18);
+}
+
+.countdown > p {
+  margin: 0 0 14px;
+  font-size: .76rem;
+  font-weight: 300;
+  letter-spacing: .1em;
+}
+
+.countdown-grid {
+  direction: ltr;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.countdown-grid span {
+  display: grid;
+  gap: 5px;
+  border-right: 1px solid rgba(87, 87, 79, .15);
+}
+
+.countdown-grid span:last-child {
+  border-right: 0;
+}
+
+.countdown-grid b {
+  font: 300 1.28rem/1 'Frank Ruhl Libre', Georgia, serif;
+  font-variant-numeric: tabular-nums;
+}
+
+.countdown-grid small {
+  font-size: .65rem;
+  font-weight: 300;
+}
+
+.today {
+  margin: 0 !important;
+  font: 300 1.3rem/1.4 'Frank Ruhl Libre', Georgia, serif;
+}
+
+.calendar-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin: 4px 0 23px;
+  padding: 11px 23px 12px;
+  color: #f7f2e8;
+  background: #89917f;
+  border-radius: 999px;
+  font-size: .82rem;
+  text-decoration: none;
+  letter-spacing: .035em;
+  box-shadow: 0 7px 16px rgba(90, 98, 82, .18);
+  transition: transform 180ms ease, background 180ms ease;
+}
+
+.calendar-button:hover {
+  background: #737b69;
+  transform: translateY(-1px);
+}
+
+.calendar-button svg {
+  width: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.5;
+}
+
+.envelope-cover {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  overflow: hidden;
+  background: #fff;
+  cursor: pointer;
+  transition: visibility 0s linear 900ms;
+}
+
+.envelope-panel {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50.5%;
+  background: #fff;
+  transition: transform 760ms cubic-bezier(.645, .045, .355, 1);
+}
+
+.panel-left {
+  left: 0;
+  border-right: 1px solid rgba(96, 83, 63, .1);
+  box-shadow: inset -12px 0 22px rgba(93, 79, 57, .025);
+}
+
+.panel-right {
+  right: 0;
+  z-index: 2;
+  border-left: 1px solid rgba(96, 83, 63, .07);
+  box-shadow: -25px 0 50px rgba(0, 0, 0, .16), -10px 0 15px rgba(0, 0, 0, .07);
+}
+
+.envelope-seam {
+  position: absolute;
+  z-index: 3;
+  inset: 0 50% 0 auto;
+  width: 1px;
+  background: linear-gradient(
+    transparent 8%,
+    rgba(91, 79, 61, .13) 22%,
+    rgba(91, 79, 61, .18) 50%,
+    rgba(91, 79, 61, .13) 78%,
+    transparent 92%
+  );
+  transition: opacity 180ms ease;
+}
+
+.seal-action {
+  position: absolute;
+  z-index: 5;
+  top: 50%;
+  left: 50%;
+  width: 310px;
+  height: 310px;
+  transform: translate(-50%, -50%);
+  transition: opacity 220ms ease, transform 400ms cubic-bezier(.2, .8, .2, 1);
+}
+
+.wax-seal {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 150px;
+  height: 150px;
+  color: #a57d2c;
+  background:
+    radial-gradient(circle at 34% 28%, rgba(255,255,255,.8), transparent 20%),
+    radial-gradient(circle at 50% 54%, #f2eadf 0 62%, #d8ccbc 63% 67%, #f6efe5 68% 73%, #cbbb9f 74%);
+  border-radius: 47% 53% 49% 51% / 52% 47% 53% 48%;
+  box-shadow:
+    0 13px 25px rgba(64, 45, 14, .22),
+    inset 0 0 0 5px rgba(255,255,255,.08),
+    inset 3px 3px 9px rgba(255,255,255,.5),
+    inset -5px -6px 11px rgba(76, 48, 7, .16);
+  font: 400 1.7rem/1 Georgia, serif;
+  direction: ltr;
+  transform: translate(-50%, -50%);
+}
+
+.wax-seal i {
+  font-style: normal;
+  font-size: .72em;
+}
+
+.seal-copy {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  animation: hint-breathe 2.2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.seal-copy text {
+  fill: #96752f;
+  font: 300 18px 'Frank Ruhl Libre', Georgia, serif;
+  letter-spacing: 1px;
+}
+
+@keyframes hint-breathe {
+  50% { opacity: .45; }
+}
+
+.envelope-cover.is-open {
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.is-open .panel-left {
+  transform: translateX(-101%);
+}
+
+.is-open .panel-right {
+  transform: translateX(101%);
+}
+
+.is-open .envelope-seam {
+  opacity: 0;
+}
+
+.is-open .seal-action {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(.72) translateY(-28px);
+  transition-duration: 260ms;
+}
+
+:focus-visible {
+  outline: 2px solid #626a58;
+  outline-offset: 4px;
+}
+
+@media (min-width: 700px) {
+  .invitation {
+    padding-block: 56px 100px;
+  }
+
+  .seal-action {
+    width: 340px;
+    height: 340px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    transition-delay: 0ms !important;
+  }
+}
