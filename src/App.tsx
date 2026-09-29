@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const WEDDING_DATE = new Date('2026-10-30T11:00:00+02:00')
 
@@ -21,141 +21,9 @@ function getCountdown(): Countdown {
   }
 }
 
-function ScratchReveal({ onReveal }: { onReveal: () => void }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const isDrawing = useRef(false)
-  const isCompleting = useRef(false)
-  const lastPoint = useRef<{ x: number; y: number } | null>(null)
-  const moveCount = useRef(0)
-  const [started, setStarted] = useState(false)
-  const [isFinishing, setIsFinishing] = useState(false)
-
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-
-    const width = canvas.clientWidth
-    const height = canvas.clientHeight
-    const ratio = window.devicePixelRatio || 1
-    canvas.width = width * ratio
-    canvas.height = height * ratio
-
-    const context = canvas.getContext('2d')
-    if (!context) return
-
-    context.scale(ratio, ratio)
-    const gradient = context.createRadialGradient(
-      width * 0.35,
-      height * 0.25,
-      width * 0.05,
-      width * 0.5,
-      height * 0.5,
-      Math.max(width, height) * 0.75,
-    )
-    gradient.addColorStop(0, '#f8f4ea')
-    gradient.addColorStop(0.72, '#e8dfcd')
-    gradient.addColorStop(1, '#d4c7af')
-    context.fillStyle = gradient
-    context.fillRect(0, 0, width, height)
-
-    context.fillStyle = '#6e6b61'
-    context.font = '300 18px Assistant, Arial'
-    context.textAlign = 'center'
-    context.direction = 'rtl'
-    context.fillText('גרדו כדי לגלות את ההזמנה', width / 2, height / 2 + 56)
-  }, [])
-
-  const revealWhenMostlyCleared = (canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) => {
-    moveCount.current += 1
-    if (moveCount.current % 8 !== 0) return
-
-    const ratio = window.devicePixelRatio || 1
-    const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data
-    const step = Math.max(12, Math.round(14 * ratio))
-    let cleared = 0
-    let sampled = 0
-
-    for (let y = 0; y < canvas.height; y += step) {
-      for (let x = 0; x < canvas.width; x += step) {
-        sampled += 1
-        if (pixels[(y * canvas.width + x) * 4 + 3] < 40) cleared += 1
-      }
-    }
-
-    if (cleared / sampled >= 0.46) {
-      isDrawing.current = false
-      if (!isCompleting.current) {
-        isCompleting.current = true
-        setIsFinishing(true)
-        window.setTimeout(onReveal, 650)
-      }
-    }
-  }
-
-  const scratch = (event: React.PointerEvent<HTMLCanvasElement>) => {
-    if (!isDrawing.current) return
-    const canvas = canvasRef.current
-    const context = canvas?.getContext('2d')
-    if (!canvas || !context) return
-
-    const bounds = canvas.getBoundingClientRect()
-    const point = { x: event.clientX - bounds.left, y: event.clientY - bounds.top }
-    const previous = lastPoint.current ?? point
-
-    context.globalCompositeOperation = 'destination-out'
-    context.lineCap = 'round'
-    context.lineJoin = 'round'
-    context.lineWidth = Math.max(68, bounds.width * 0.18)
-    context.beginPath()
-    context.moveTo(previous.x, previous.y)
-    context.lineTo(point.x, point.y)
-    context.stroke()
-
-    lastPoint.current = point
-    revealWhenMostlyCleared(canvas, context)
-  }
-
-  return (
-    <div
-      className={[
-        'scratch-area',
-        started ? 'has-started' : '',
-        isFinishing ? 'is-finishing' : '',
-      ].filter(Boolean).join(' ')}
-    >
-      <canvas
-        ref={canvasRef}
-        aria-label="גרדו על המסך כדי לחשוף את ההזמנה"
-        onPointerDown={(event) => {
-          isDrawing.current = true
-          lastPoint.current = null
-          setStarted(true)
-          event.currentTarget.setPointerCapture(event.pointerId)
-          scratch(event)
-        }}
-        onPointerMove={scratch}
-        onPointerUp={() => {
-          isDrawing.current = false
-          lastPoint.current = null
-        }}
-        onPointerCancel={() => {
-          isDrawing.current = false
-          lastPoint.current = null
-        }}
-      />
-      <span className="scratch-hint" aria-hidden="true">
-        <svg viewBox="0 0 32 32">
-          <path d="M13 27c-2.8-2.5-5.3-5.4-6.8-8.2-.7-1.3-.1-2.9 1.3-3.4.9-.3 1.9 0 2.5.8l1.3 1.8V6.5A2.5 2.5 0 0 1 13.8 4a2.5 2.5 0 0 1 2.5 2.5v7-3a2.3 2.3 0 0 1 4.6 0v3-1.7a2.3 2.3 0 0 1 4.6 0v5.5c0 5.8-3.7 10.7-9.5 10.7h-3Z" />
-        </svg>
-        העבירו אצבע
-      </span>
-    </div>
-  )
-}
-
 function App() {
   const [isOpen, setIsOpen] = useState(false)
-  const [isRevealed, setIsRevealed] = useState(false)
+  const [isReady, setIsReady] = useState(false)
   const [countdown, setCountdown] = useState(getCountdown)
   const calendarUrl = `${import.meta.env.BASE_URL}karin-niv-wedding.ics`
 
@@ -164,26 +32,42 @@ function App() {
     return () => window.clearInterval(timer)
   }, [])
 
+  useEffect(() => {
+    if (!isOpen) return
+
+    window.scrollTo({ top: 0, behavior: 'instant' })
+    const timer = window.setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'instant' })
+      setIsReady(true)
+    }, 3_500)
+
+    return () => window.clearTimeout(timer)
+  }, [isOpen])
+
+  const openInvitation = () => {
+    window.scrollTo({ top: 0, behavior: 'instant' })
+    setIsOpen(true)
+  }
+
   return (
-    <main className="invitation">
+    <main className={[
+      'invitation',
+      isOpen ? 'is-open' : '',
+      isReady ? 'is-ready' : '',
+    ].filter(Boolean).join(' ')}>
       <div className="paper-grain" aria-hidden="true" />
 
       <article className="card">
-        <div className="artwork">
-          <img
-            src={`${import.meta.env.BASE_URL}invitation.jpeg`}
-            alt="הזמנה לחתונה של קרין וניב ביום שישי 30 באוקטובר 2026"
-            width="752"
-            height="1024"
-          />
-          {isOpen && !isRevealed && <ScratchReveal onReveal={() => setIsRevealed(true)} />}
-        </div>
+        <img
+          className="artwork"
+          src={`${import.meta.env.BASE_URL}invitation.jpeg`}
+          alt="הזמנה לחתונה של קרין וניב ביום שישי 30 באוקטובר 2026"
+          width="752"
+          height="1024"
+        />
 
         <div className="card-details">
-          <a
-            className="calendar-button"
-            href={calendarUrl}
-          >
+          <a className="calendar-button" href={calendarUrl}>
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M7 2v3M17 2v3M3.5 9h17M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z" />
               <path d="m9 15 2 2 4-5" />
@@ -215,11 +99,11 @@ function App() {
         tabIndex={isOpen ? -1 : 0}
         aria-label="פתיחת ההזמנה"
         aria-hidden={isOpen}
-        onClick={() => setIsOpen(true)}
+        onClick={openInvitation}
         onKeyDown={(event) => {
           if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault()
-            setIsOpen(true)
+            openInvitation()
           }
         }}
       >
@@ -230,7 +114,7 @@ function App() {
           <div className="wax-seal">
             <span>K</span><i>&</i><span>N</span>
           </div>
-          <span className="seal-copy" dir="rtl">לחצו כאן לפתיחת ההזמנה</span>
+          <span className="seal-copy" dir="rtl">לחץ כאן לפתוח את ההזמנה</span>
         </div>
       </div>
     </main>
